@@ -38,14 +38,19 @@ int main(int argc, char* argv[]) {
 
     if(API::wallFront() == true) {
         map_data[current_position.y][current_position.x] |= 0b10001000 >> mouse_direction;
+    } else {
+        map_data[current_position.y][current_position.x] &= ~(0b10001000 >> mouse_direction);
     }
     if(API::wallRight() == true) {
         map_data[current_position.y][current_position.x] |= 0b01000100 >> mouse_direction;
+    } else {
+        map_data[current_position.y][current_position.x] &= ~(0b01000100 >> mouse_direction);
     }
     if(API::wallLeft() == true) {
         map_data[current_position.y][current_position.x] |= 0b00010001 >> mouse_direction;
+    } else {
+        map_data[current_position.y][current_position.x] &= ~(0b00010001 >> mouse_direction);
     }
-    map_data[current_position.y][current_position.x] &= 0b00001111;
 
     //////////////////////////////////
 
@@ -64,14 +69,76 @@ int main(int argc, char* argv[]) {
 
     if(API::wallFront() == true) {
         map_data[current_position.y][current_position.x] |= 0b10001000 >> mouse_direction;
+    } else {
+        map_data[current_position.y][current_position.x] &= ~(0b10001000 >> mouse_direction);
     }
     if(API::wallRight() == true) {
         map_data[current_position.y][current_position.x] |= 0b01000100 >> mouse_direction;
+    } else {
+        map_data[current_position.y][current_position.x] &= ~(0b01000100 >> mouse_direction);
     }
     if(API::wallLeft() == true) {
         map_data[current_position.y][current_position.x] |= 0b00010001 >> mouse_direction;
+    } else {
+        map_data[current_position.y][current_position.x] &= ~(0b00010001 >> mouse_direction);
     }
-    map_data[current_position.y][current_position.x] &= 0b00001111;
+
+    for(int16_t y = 0; y < map_size_y; y++) {
+        for(int16_t x = 0; x < map_size_x; x++) {      
+            draw.SetBlock(algo.GetWeight({x, y}), map_data[y][x], {x,y});
+        }
+    }
+    
+    API::moveForward();
+    API::turnRight();
+
+    mouse_direction = 1;
+
+    current_position.x = 0;
+    current_position.y = 2;
+
+    if(API::wallFront() == true) {
+        map_data[current_position.y][current_position.x] |= 0b10001000 >> mouse_direction;
+    } else {
+        map_data[current_position.y][current_position.x] &= ~(0b10001000 >> mouse_direction);
+    }
+    if(API::wallRight() == true) {
+        map_data[current_position.y][current_position.x] |= 0b01000100 >> mouse_direction;
+    } else {
+        map_data[current_position.y][current_position.x] &= ~(0b01000100 >> mouse_direction);
+    }
+    if(API::wallLeft() == true) {
+        map_data[current_position.y][current_position.x] |= 0b00010001 >> mouse_direction;
+    } else {
+        map_data[current_position.y][current_position.x] &= ~(0b00010001 >> mouse_direction);
+    }
+
+    for(int16_t y = 0; y < map_size_y; y++) {
+        for(int16_t x = 0; x < map_size_x; x++) {      
+            draw.SetBlock(algo.GetWeight({x, y}), map_data[y][x], {x,y});
+        }
+    }
+
+    API::moveForward();
+
+    current_position.x = 1;
+    current_position.y = 2;
+
+    if(API::wallFront() == true) {
+        map_data[current_position.y][current_position.x] |= 0b10001000 >> mouse_direction;
+    } else {
+        map_data[current_position.y][current_position.x] &= ~(0b10001000 >> mouse_direction);
+    }
+    if(API::wallRight() == true) {
+        map_data[current_position.y][current_position.x] |= 0b01000100 >> mouse_direction;
+    } else {
+        map_data[current_position.y][current_position.x] &= ~(0b01000100 >> mouse_direction);
+    }
+    if(API::wallLeft() == true) {
+        map_data[current_position.y][current_position.x] |= 0b00010001 >> mouse_direction;
+    } else {
+        map_data[current_position.y][current_position.x] &= ~(0b00010001 >> mouse_direction);
+    }
 
     for(int16_t y = 0; y < map_size_y; y++) {
         for(int16_t x = 0; x < map_size_x; x++) {      
