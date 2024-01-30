@@ -1,148 +1,78 @@
 #include "API.h"
 #include "Draw.h"
-
 #include "Moving.h"
-#include "Algo.h"
 
-#define N_WAY (0b00001000)
-#define E_WAY (0b00000100)
-#define S_WAY (0b00000010)
-#define W_WAY (0b00000001)
+#include "Map.h"
+#include "Controller.h"
 
-#define N_DIR (0)
-#define E_DIR (1)
-#define S_DIR (2)
-#define W_DIR (3)
+uint8_t sensorData(uint8_t way) {
+    uint8_t data = 0x00;
+    way += (way << 4);
+    if(API::wallFront() == true) {
+        data |= way;
+    } else {
+        data &= ~way;
+    }
+    if(API::wallRight() == true) {
+        data |= (way >> 1);
+    } else {
+        data &= ~(way >> 1);
+    }
+    if(API::wallLeft() == true) {
+        data |= (way >> 3);
+    } else {
+        data &= ~(way >> 3);
+    }
+    data &= 0x0F;
+    return data;
+}
 
 int main(int argc, char* argv[]) {
     API::log("Start");
-
     
     /////////////////////////////////
-    const int16_t map_size_x = 16;
-    const int16_t map_size_y = 16;
+    Map map({16, 16});
 
-    Draw draw; 
-    Algo algo({map_size_x, map_size_y});
+    Controller ctl(map, {0, 0}, spat::way::n);
+    
+    Draw draw(ctl.GetWeightPointer(), map);
+    int16_t turn;
+    Moving mov(turn);
 
-    algo.SetWeight({7,7},0);
-    algo.SetWeight({7,8},0);
-    algo.SetWeight({8,8},0);
-    algo.SetWeight({8,7},0);
-    /////////////////////////////////
+/////////////////////
+    // {
+    //     map_data[0][0] = 0b0111;
+    //     map_data[7][7] = 0b0010;
+    //     map_data[7][8] = 0b0110;
+    //     map_data[8][7] = 0b1001;
+    //     map_data[8][8] = 0b1100;
+    // }
+/////////////////////
 
-    uint8_t map_data[map_size_y][map_size_x] = {0};
+    ctl.SetEnd({7, 7}, {2, 2});
+    draw.Update();
+    ctl.Update();
+    
+    draw.Update();
+    while(1);
 
-    spat::Vec2<int16_t> current_position = {0, 0};
-    uint8_t mouse_direction = 0;
+    // draw.Update();
+    
+    // uint8_t way = ctl.GetCurrentWay();
+    // API::setColor(pos.x, pos.y, 'y');
+    // ctl.Goto();
+    // turn = ctl.Turn();
+    // mov.Move();
 
-    if(API::wallFront() == true) {
-        map_data[current_position.y][current_position.x] |= 0b10001000 >> mouse_direction;
-    } else {
-        map_data[current_position.y][current_position.x] &= ~(0b10001000 >> mouse_direction);
-    }
-    if(API::wallRight() == true) {
-        map_data[current_position.y][current_position.x] |= 0b01000100 >> mouse_direction;
-    } else {
-        map_data[current_position.y][current_position.x] &= ~(0b01000100 >> mouse_direction);
-    }
-    if(API::wallLeft() == true) {
-        map_data[current_position.y][current_position.x] |= 0b00010001 >> mouse_direction;
-    } else {
-        map_data[current_position.y][current_position.x] &= ~(0b00010001 >> mouse_direction);
-    }
-
-    //////////////////////////////////
-
-    algo.Update();
-
-    for(int16_t y = 0; y < map_size_y; y++) {
-        for(int16_t x = 0; x < map_size_x; x++) {      
-            draw.SetBlock(algo.GetWeight({x, y}), map_data[x][y], {x,y});
-        }
-    }
-
-    current_position.x = 0;
-    current_position.y = 1;
-
-    API::moveForward();
-
-    if(API::wallFront() == true) {
-        map_data[current_position.y][current_position.x] |= 0b10001000 >> mouse_direction;
-    } else {
-        map_data[current_position.y][current_position.x] &= ~(0b10001000 >> mouse_direction);
-    }
-    if(API::wallRight() == true) {
-        map_data[current_position.y][current_position.x] |= 0b01000100 >> mouse_direction;
-    } else {
-        map_data[current_position.y][current_position.x] &= ~(0b01000100 >> mouse_direction);
-    }
-    if(API::wallLeft() == true) {
-        map_data[current_position.y][current_position.x] |= 0b00010001 >> mouse_direction;
-    } else {
-        map_data[current_position.y][current_position.x] &= ~(0b00010001 >> mouse_direction);
-    }
-
-    for(int16_t y = 0; y < map_size_y; y++) {
-        for(int16_t x = 0; x < map_size_x; x++) {      
-            draw.SetBlock(algo.GetWeight({x, y}), map_data[y][x], {x,y});
-        }
+    while(true) {
+        map.Update(ctl.GetCurrentPosition(), sensorData(ctl.GetCurrentWay()));
+        // API::log(std::to_string(map.GetCurrentWay()));
+        draw.Update();
+        ctl.Goto();
+        turn = ctl.Turn();
+        mov.Move();
     }
     
-    API::moveForward();
-    API::turnRight();
-
-    mouse_direction = 1;
-
-    current_position.x = 0;
-    current_position.y = 2;
-
-    if(API::wallFront() == true) {
-        map_data[current_position.y][current_position.x] |= 0b10001000 >> mouse_direction;
-    } else {
-        map_data[current_position.y][current_position.x] &= ~(0b10001000 >> mouse_direction);
-    }
-    if(API::wallRight() == true) {
-        map_data[current_position.y][current_position.x] |= 0b01000100 >> mouse_direction;
-    } else {
-        map_data[current_position.y][current_position.x] &= ~(0b01000100 >> mouse_direction);
-    }
-    if(API::wallLeft() == true) {
-        map_data[current_position.y][current_position.x] |= 0b00010001 >> mouse_direction;
-    } else {
-        map_data[current_position.y][current_position.x] &= ~(0b00010001 >> mouse_direction);
-    }
-
-    for(int16_t y = 0; y < map_size_y; y++) {
-        for(int16_t x = 0; x < map_size_x; x++) {      
-            draw.SetBlock(algo.GetWeight({x, y}), map_data[y][x], {x,y});
-        }
-    }
-
-    API::moveForward();
-
-    current_position.x = 1;
-    current_position.y = 2;
-
-    if(API::wallFront() == true) {
-        map_data[current_position.y][current_position.x] |= 0b10001000 >> mouse_direction;
-    } else {
-        map_data[current_position.y][current_position.x] &= ~(0b10001000 >> mouse_direction);
-    }
-    if(API::wallRight() == true) {
-        map_data[current_position.y][current_position.x] |= 0b01000100 >> mouse_direction;
-    } else {
-        map_data[current_position.y][current_position.x] &= ~(0b01000100 >> mouse_direction);
-    }
-    if(API::wallLeft() == true) {
-        map_data[current_position.y][current_position.x] |= 0b00010001 >> mouse_direction;
-    } else {
-        map_data[current_position.y][current_position.x] &= ~(0b00010001 >> mouse_direction);
-    }
-
-    for(int16_t y = 0; y < map_size_y; y++) {
-        for(int16_t x = 0; x < map_size_x; x++) {      
-            draw.SetBlock(algo.GetWeight({x, y}), map_data[y][x], {x,y});
-        }
-    }
+    API::log("End");
+    Sleep(100);
 }

@@ -5,31 +5,25 @@
 #include <iomanip>
 #include <windows.h>
 
-#define N_WAY (0b00001000)
-#define E_WAY (0b00000100)
-#define S_WAY (0b00000010)
-#define W_WAY (0b00000001)
+void Draw::Update() {
+    for(int16_t y = 0; y < m_map_size.y; y++) {
+        for(int16_t x = 0; x < m_map_size.x; x++) {
+            SetBlock(m_weight[y][x], m_mapdata[y][x], {x,y});
+        }
+    }
+}
 
-// void Draw::Update() {
-//     for(int y = 0; y < m_map_size.y; y++) {
-//         for(int x = 0; x < m_map_size.x; x++) {
-//             SetBlock();
-//         }
-//     }
-// }
-
-void Draw::SetBlock(float weight, int8_t draw_position_map_data, spat::Vec2<int16_t> draw_position) {
-    std::string hexString = Float2String(weight);
-    API::setText(draw_position.x, draw_position.y, hexString);
-    if(draw_position_map_data & N_WAY)
-        API::setWall(draw_position.x, draw_position.y, 'n');
-    if(draw_position_map_data & E_WAY)
-        API::setWall(draw_position.x, draw_position.y, 'e');
-    if(draw_position_map_data & S_WAY)
-        API::setWall(draw_position.x, draw_position.y, 's');
-    if(draw_position_map_data & W_WAY)
-        API::setWall(draw_position.x, draw_position.y, 'w');
-    Sleep(0.1);
+void Draw::SetBlock(float weight, uint8_t draw_position_map_data, spat::vec2<int16_t> draw_position) {
+    std::string str = Float2String(weight);
+    API::setText(draw_position, str);
+    if((~draw_position_map_data & spat::way::n))
+        API::setWall(draw_position, 'n');
+    if((~draw_position_map_data & spat::way::e))
+        API::setWall(draw_position, 'e');
+    if((~draw_position_map_data & spat::way::s))
+        API::setWall(draw_position, 's');
+    if((~draw_position_map_data & spat::way::w))
+        API::setWall(draw_position, 'w');
 }
 
 std::string Draw::Float2String(float num) {

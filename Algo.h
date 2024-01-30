@@ -1,30 +1,52 @@
-#ifndef ALGO_H_
-#define ALGO_H_
+#pragma once
 
 #include "Utilities.h"
+#include "Map.h"
 #include <queue>
-#include <string>
+#include <vector>
 
 class Algo {
 private:
-    const spat::Vec2<int16_t> m_map_size;
+    Map& m_map;
+    spat::vec2<int16_t> m_start_point = {0, 0};
+    
+    std::queue<spat::vec2<int16_t>> m_queue_position;
+    
+
+    uint8_t** m_count_n;
+    uint8_t** m_count_ne;
+    uint8_t** m_count_e;
+    uint8_t** m_count_es;
+    uint8_t** m_count_s;
+    uint8_t** m_count_sw;
+    uint8_t** m_count_w;
+    uint8_t** m_count_wn;
+
+
+    std::vector<uint8_t> m_path;
+
+protected:
+    uint8_t** m_mapdata;
+    spat::vec2<int16_t> m_map_size;
+    uint8_t** m_way;
     float** m_weight;
-    bool** m_weight_check;
-    spat::Vec2<int16_t> vec_p;
-    spat::Vec2<int16_t> vec_n;
-    std::queue<spat::Vec2<int16_t>> m_update_position;
+    float m_weight_max;
+
 public:
-    Algo(spat::Vec2<int16_t> map_size);
+    Algo(Map& map);
     ~Algo();
-    void Update();
-    void SetWeight(spat::Vec2<int16_t> pos, float weight) {
-        m_update_position.push(pos);
+    void SetMap(Map& map);
+    void SetEnd(spat::vec2<int16_t> pos, spat::vec2<int16_t> size);
+    void SetWeight(spat::vec2<int16_t> pos, float weight) {
+        m_queue_position.push(pos);
         m_weight[pos.y][pos.x] = weight;
     }
-    float GetWeight(spat::Vec2<int16_t> pos) {
-        return m_weight[pos.y][pos.x];
-    }
-private:
-};
+    float** GetWeightPointer() { return m_weight; }
+    void Update();
 
-#endif
+private:
+    float CalculateDistance(std::vector<uint8_t> path);
+    void FindPath();
+    void Init();
+    void Clean();
+};
