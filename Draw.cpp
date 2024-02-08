@@ -15,7 +15,7 @@ void Draw::Update() {
 
 void Draw::SetBlock(float weight, uint8_t draw_position_map_data, spat::vec2<int16_t> draw_position) {
     std::string str = Float2String(weight);
-    API::setText(draw_position, str);
+    // API::setText(draw_position, str);
     if((~draw_position_map_data & spat::way::n))
         API::setWall(draw_position, 'n');
     if((~draw_position_map_data & spat::way::e))

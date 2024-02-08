@@ -36,43 +36,51 @@ int main(int argc, char* argv[]) {
     Controller ctl(map, {0, 0}, spat::way::n);
     
     Draw draw(ctl.GetWeightPointer(), map);
-    int16_t turn;
+    spat::turn turn;
     Moving mov(turn);
 
-/////////////////////
-    // {
-    //     map_data[0][0] = 0b0111;
-    //     map_data[7][7] = 0b0010;
-    //     map_data[7][8] = 0b0110;
-    //     map_data[8][7] = 0b1001;
-    //     map_data[8][8] = 0b1100;
+    turn = spat::turn::r90;
+    mov.Move();
+    turn = spat::turn::l90;
+    mov.Move();
+
+    // while(true) {
+    //     API::log("Running");
+    //     ctl.Reset();
+    //     ctl.SetEndPoint({7,7});
+    //     ctl.SetEndPoint({7,8});
+    //     ctl.SetEndPoint({8,8});
+    //     ctl.SetEndPoint({8,7});
+    //     ctl.Update();
+    //     // ctl.Path();
+
+    //     while(ctl.End() != true) {
+    //         map.Update(ctl.GetCurrentPosition(), sensorData(ctl.GetCurrentWay()));
+    //         draw.Update();
+
+    //         turn = ctl.Goto();
+    //         mov.Move();
+    //     }
+
+    //     API::log("End");
+
+    //     ctl.Reset();
+
+    //     ctl.SetEndPoint({0,0});
+
+    //     ctl.Update();
+    //     // ctl.Path();
+
+    //     API::log("Returning");
+
+    //     while(ctl.End() != true) {
+    //         map.Update(ctl.GetCurrentPosition(), sensorData(ctl.GetCurrentWay()));
+    //         draw.Update();
+
+    //         turn = ctl.Goto();
+    //         mov.Move();
+    //     }
+    //     API::log("End returning");
     // }
-/////////////////////
 
-    ctl.SetEnd({7, 7}, {2, 2});
-    draw.Update();
-    ctl.Update();
-    
-    draw.Update();
-    while(1);
-
-    // draw.Update();
-    
-    // uint8_t way = ctl.GetCurrentWay();
-    // API::setColor(pos.x, pos.y, 'y');
-    // ctl.Goto();
-    // turn = ctl.Turn();
-    // mov.Move();
-
-    while(true) {
-        map.Update(ctl.GetCurrentPosition(), sensorData(ctl.GetCurrentWay()));
-        // API::log(std::to_string(map.GetCurrentWay()));
-        draw.Update();
-        ctl.Goto();
-        turn = ctl.Turn();
-        mov.Move();
-    }
-    
-    API::log("End");
-    Sleep(100);
 }

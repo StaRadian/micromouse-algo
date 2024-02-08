@@ -7,46 +7,48 @@
 
 class Algo {
 private:
-    Map& m_map;
-    spat::vec2<int16_t> m_start_point = {0, 0};
-    
     std::queue<spat::vec2<int16_t>> m_queue_position;
-    
+    spat::vec2<int16_t> m_map_size;
 
-    uint8_t** m_count_n;
-    uint8_t** m_count_ne;
-    uint8_t** m_count_e;
-    uint8_t** m_count_es;
-    uint8_t** m_count_s;
-    uint8_t** m_count_sw;
-    uint8_t** m_count_w;
-    uint8_t** m_count_wn;
+    bool** m_weight_check;
+    bool** m_weight_fix;
+    float m_weight_max;
 
-
-    std::vector<uint8_t> m_path;
+    uint16_t** m_straight_count;
 
 protected:
-    uint8_t** m_mapdata;
-    spat::vec2<int16_t> m_map_size;
-    uint8_t** m_way;
     float** m_weight;
-    float m_weight_max;
+    Map& m_map;
+    uint8_t** m_mapdata;
+    uint8_t** m_way;
 
 public:
     Algo(Map& map);
     ~Algo();
-    void SetMap(Map& map);
-    void SetEnd(spat::vec2<int16_t> pos, spat::vec2<int16_t> size);
-    void SetWeight(spat::vec2<int16_t> pos, float weight) {
+    // void SetMap(Map& map);
+    // void SetEnd(spat::vec2<int16_t> pos, spat::vec2<int16_t> size);
+    void SetPush(spat::vec2<int16_t> pos) {
+        QueuePositionPush(pos);
+    }
+    void SetEndPoint(spat::vec2<int16_t> pos) {
+        spat::vec2comp<int16_t> vec(pos);
         m_queue_position.push(pos);
-        m_weight[pos.y][pos.x] = weight;
+        m_weight[pos.y][pos.x] = 0;
+        m_weight_fix[pos.y][pos.x] = true;
+        uint8_t my_mapdata = m_mapdata[pos.y][pos.x];
+        if(my_mapdata & spat::way::n) QueuePositionPush(vec.n);
+        if(my_mapdata & spat::way::e) QueuePositionPush(vec.e);
+        if(my_mapdata & spat::way::s) QueuePositionPush(vec.s);
+        if(my_mapdata & spat::way::w) QueuePositionPush(vec.w);
     }
     float** GetWeightPointer() { return m_weight; }
     void Update();
+    uint8_t** GetWay(spat::vec2<int16_t> vec) { return m_way; }
+    void Reset();
 
 private:
-    float CalculateDistance(std::vector<uint8_t> path);
-    void FindPath();
+    float IncreaseWeight(spat::vec2<int16_t> pos, uint8_t way);
+    void QueuePositionPush(spat::vec2<int16_t> vec);
     void Init();
     void Clean();
 };
